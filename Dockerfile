@@ -19,4 +19,11 @@ RUN git -c http.sslVerify=false clone https://gitlab.com/libeigen/eigen.git --br
     cmake --build eigen/build -j $(nproc) -t install && \
     rm -rfv eigen
 
-ENV CMAKE_PREFIX_PATH=/opt/eigen
+# Install GoogleTest
+RUN git -c http.sslVerify=false clone https://github.com/google/googletest.git --branch v1.16.0 --depth 1 && \
+    cmake -S googletest -B googletest/build && \
+    cmake --build googletest/build -j $(nproc) && \
+    cmake --install googletest/build --prefix /opt/googletest && \
+    rm -rfv googletest
+
+ENV CMAKE_PREFIX_PATH=/opt/eigen:/opt/googletest

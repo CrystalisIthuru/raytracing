@@ -3,7 +3,9 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/include",
+                "/opt/eigen/include/eigen3/",
+                "/opt/googletest/include/"
             ],
             "defines": [],
             "compilerPath": "/opt/rh/gcc-toolset-11/root/usr/bin/gcc",

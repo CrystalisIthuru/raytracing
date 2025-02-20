@@ -37,7 +37,11 @@
 	// Configure tool-specific properties.
 	"customizations": {
         "vscode": {
-            "extensions": ["redhat.java", "redhat.vscode-xml"]
+            "extensions": [
+                "ms-vscode.cpptools",
+                "redhat.vscode-xml",
+                "ngtystr.ppm-pgm-viewer-for-vscode"
+            ]
         }
     }
 
