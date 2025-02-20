@@ -3,12 +3,14 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/raytracing/include",
+                "/opt/eigen/include/eigen3/",
+                "/opt/googletest/include/"
             ],
             "defines": [],
             "compilerPath": "/opt/rh/gcc-toolset-11/root/usr/bin/gcc",
             "cStandard": "c17",
-            "cppStandard": "c++98",
+            "cppStandard": "c++17",
             "intelliSenseMode": "linux-gcc-x64"
         }
     ],
