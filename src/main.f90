@@ -12,6 +12,6 @@ program hello
     simple_image%image(1, 3) = int(z'0000FF')
     simple_image%image(2, 1) = int(z'FFFF00')
     simple_image%image(2, 2) = int(z'FFFFFF')
-    call simple_image%writePPM("out.ppm")
+    call simple_image%writePPM("images/out.ppm")
 
 end program hello
