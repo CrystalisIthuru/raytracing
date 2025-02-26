@@ -12,33 +12,15 @@ endif()
 # Project Settings ------------------------------------------------------
 # -----------------------------------------------------------------------
 
-project(raytracers)
-
-find_package(Eigen3 REQUIRED NO_MODULE)
-find_package(GTest REQUIRED)
+project(raytracers Fortran)
 
 #--- Raytracer Library --------------------------------------------------
 add_library(raytracer STATIC
-    src/raytracer/images/Pixel.cxx
-    src/raytracer/images/RGBImage.cxx
-)
-target_link_libraries(raytracer
-    Eigen3::Eigen
-)
-target_include_directories(raytracer PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    src/raytracer/images/RGBImage.f90
 )
 
-#--- Test Executable ----------------------------------------------------
-add_executable(test_raytracer
-    test/images/Test_RGBImage.cxx
+#--- Fortran Executable -------------------------------------------------
+add_executable(check
+    src/main.f90
 )
-target_link_libraries(test_raytracer
-    raytracer
-    GTest::GTest
-    GTest::Main
-)
-
-#--- Check Executable ---------------------------------------------------
-add_executable(check src/main.cxx)
 target_link_libraries(check raytracer)
