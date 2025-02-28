@@ -8,6 +8,8 @@ find_package(GTest REQUIRED)
 add_library(raytracing STATIC
     src/raytracing/images/Pixel.cxx
     src/raytracing/images/RGBImage.cxx
+    src/raytracing/math/Ray.cxx
+    src/raytracing/scene/Camera.cxx
 )
 target_link_libraries(raytracing
     Eigen3::Eigen
@@ -20,6 +22,7 @@ install(TARGETS raytracing DESTINATION lib)
 #--- Test Executable ----------------------------------------------------
 add_executable(test_raytracing
     test/images/Test_RGBImage.cxx
+    test/math/Test_Ray.cxx
 )
 target_link_libraries(test_raytracing
     raytracing
