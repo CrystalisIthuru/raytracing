@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 
 #include <Eigen/Core>
 
@@ -7,6 +8,8 @@
 #include <raytracing/math/Ray.h>
 #include <raytracing/scene/Camera.h>
 #include <raytracing/shapes/Sphere.h>
+#include <raytracing/shapes/HittableList.h>
+#include <raytracing/math/Interval.h>
 
 int main(int argc, char **argv) {
 
@@ -26,15 +29,21 @@ int main(int argc, char **argv) {
         image_width
     );
 
+    raytracing::shapes::HittableList world({
+        std::make_shared<raytracing::shapes::Sphere>(Eigen::Vector3d(0.0, 0.0, -1.0), 0.5),
+        std::make_shared<raytracing::shapes::Sphere>(Eigen::Vector3d(0, -100.5, -1.0), 100)
+    });
+
     // Render
-    raytracing::shapes::Sphere sphere({0.0, 0.0, -1.0}, 0.5);
     raytracing::images::RGBImage image(image_width, image_height);
     for(int i = 0; i < image.height(); ++i) {
         for(int j = 0; j < image.width(); ++j) {
 
             const raytracing::math::Ray &ray = camera.rays()(i, j);
-            if(sphere.hit(ray)) {
-                image.image()(i, j) = 0xFF0000;
+
+            raytracing::shapes::HitRecord record;
+            if(world.hit(ray, raytracing::math::Interval(0.0, raytracing::math::infinity), record)) {
+                image.image()(i, j) = raytracing::images::Pixel(0.5 * (record.n + Eigen::Vector3d::Ones()));
             } else {
                 // Determine the pixel color value by blending white to a
                 // sky blue color.
@@ -52,7 +61,7 @@ int main(int argc, char **argv) {
         std::filesystem::create_directory("images");
     }
     std::fstream output;
-    output.open("images/5_AddingASphere.ppm", std::ios_base::out);
+    output.open("images/sphere.ppm", std::ios_base::out);
     image.toPPM(output);
     output.close();
 

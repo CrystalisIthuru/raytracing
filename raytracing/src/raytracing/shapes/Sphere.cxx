@@ -12,13 +12,36 @@ const Eigen::Vector3d& Sphere::center() const {
     return _center;
 }
 
-bool Sphere::hit(const math::Ray &ray) const {
+bool Sphere::hit(
+    const math::Ray &ray, const math::Interval &tvalid, HitRecord &record
+) const {
+
     Eigen::Vector3d oc = _center - ray.origin();
-    auto a = ray.direction().dot(ray.direction());
-    auto b = -2.0 * ray.direction().dot(oc);
-    auto c = oc.dot(oc) - std::pow(_radius, 2.0);
-    double discriminant = b * b - 4 * a * c;
-    return discriminant >= 0;
+    auto a = ray.direction().norm() * ray.direction().norm();
+    auto h = ray.direction().dot(oc);
+    auto c = oc.norm() * oc.norm() - _radius * _radius;
+    double discriminant = h * h - a * c;
+
+    if(discriminant < 0) {
+        return false;
+    };
+    
+    // Find the nearest root in the acceptable range.
+    double sqrtd = std::sqrt(discriminant);
+    double root = (h - sqrtd) / a;
+    if(!tvalid.contains(root)) {
+        root = (h + sqrtd) / a;
+        if(!tvalid.contains(root)) {
+            return false;
+        }
+    }
+
+    record.t = root;
+    record.p = ray.at(record.t);
+    record.n = (record.p - _center) / _radius;
+
+    return true;
+    
 }
 
 double Sphere::radius() const {

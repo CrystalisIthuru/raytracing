@@ -8,8 +8,10 @@ find_package(GTest REQUIRED)
 add_library(raytracing STATIC
     src/raytracing/images/Pixel.cxx
     src/raytracing/images/RGBImage.cxx
+    src/raytracing/math/Interval.cxx
     src/raytracing/math/Ray.cxx
     src/raytracing/scene/Camera.cxx
+    src/raytracing/shapes/HittableList.cxx
     src/raytracing/shapes/Sphere.cxx
 )
 target_link_libraries(raytracing

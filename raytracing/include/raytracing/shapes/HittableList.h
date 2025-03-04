@@ -1,29 +1,32 @@
 #pragma once
 
-#include <Eigen/Core>
-#include <raytracing/math/Ray.h>
+#include <memory>
+#include <vector>
+
 #include <raytracing/shapes/Hittable.h>
 
 namespace raytracing {
 namespace shapes {
 
-class Sphere : public Hittable {
 
-    Eigen::Vector3d _center;
-    double _radius;
+class HittableList : public Hittable {
+
+    std::vector<std::shared_ptr<Hittable>> objects;
 
 public:
 
-    /**
-        @param center The centerpoint of the sphere.
-        @param radius The radius of the sphere.
-    **/
-    Sphere(const Eigen::Vector3d &center, double radius);
+    HittableList();
+    HittableList(const std::vector<std::shared_ptr<Hittable>> &objects);
 
     /**
-        @returns The centerpoint of the sphere.
+        Adds a hittable to the list.
+
+        @param object A pointer to a hittable
     **/
-    const Eigen::Vector3d& center() const;
+    void add(std::shared_ptr<Hittable> object);
+
+    /** Removes all hittables from the list **/
+    void clear();
 
     /**
         Determines whether the provided ray will intersect the
@@ -40,12 +43,9 @@ public:
         HitRecord &record
     ) const;
 
-    /**
-        @returns The radius of the sphere.
-    **/
-    double radius() const;
 
 };
+
 
 }
 }

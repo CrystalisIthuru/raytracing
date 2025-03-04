@@ -1,29 +1,15 @@
 #pragma once
 
-#include <Eigen/Core>
+#include <raytracing/math/Interval.h>
 #include <raytracing/math/Ray.h>
-#include <raytracing/shapes/Hittable.h>
+#include <raytracing/shapes/HitRecord.h>
 
 namespace raytracing {
 namespace shapes {
 
-class Sphere : public Hittable {
-
-    Eigen::Vector3d _center;
-    double _radius;
-
+/** A shape that a ray can hit. **/
+class Hittable {
 public:
-
-    /**
-        @param center The centerpoint of the sphere.
-        @param radius The radius of the sphere.
-    **/
-    Sphere(const Eigen::Vector3d &center, double radius);
-
-    /**
-        @returns The centerpoint of the sphere.
-    **/
-    const Eigen::Vector3d& center() const;
 
     /**
         Determines whether the provided ray will intersect the
@@ -38,12 +24,7 @@ public:
         const math::Ray &ray,
         const math::Interval &tvalid,
         HitRecord &record
-    ) const;
-
-    /**
-        @returns The radius of the sphere.
-    **/
-    double radius() const;
+    ) const = 0;
 
 };
 
