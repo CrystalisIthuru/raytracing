@@ -25,11 +25,6 @@ public:
     const Eigen::Vector3d& center() const;
 
     /**
-        @returns The radius of the sphere.
-    **/
-    double radius() const;
-
-    /**
         Determines whether the provided ray will intersect the
         sphere.
 
@@ -37,7 +32,12 @@ public:
         @returns True if the ray intersects the sphere at any
             point.
     **/
-    bool will_intersect(const math::Ray &ray) const;
+    bool hit(const math::Ray &ray) const;
+
+    /**
+        @returns The radius of the sphere.
+    **/
+    double radius() const;
 
 };
 

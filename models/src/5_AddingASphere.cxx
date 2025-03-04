@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
         for(int j = 0; j < image.width(); ++j) {
 
             const raytracing::math::Ray &ray = camera.rays()(i, j);
-            if(sphere.will_intersect(ray)) {
+            if(sphere.hit(ray)) {
                 image.image()(i, j) = 0xFF0000;
             } else {
                 // Determine the pixel color value by blending white to a
