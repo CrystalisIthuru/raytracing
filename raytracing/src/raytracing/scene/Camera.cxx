@@ -1,4 +1,6 @@
+#include <iostream>
 #include <raytracing/scene/Camera.h>
+#include <raytracing/math/Conversions.h>
 
 namespace raytracing {
 namespace scene {
@@ -6,18 +8,24 @@ namespace scene {
 Camera::Camera(
     const Eigen::Vector3d &center,
     double focal_length,
+    double fov,
     int image_height,
     int image_width
 )
     : camera_center(center)
     , focal_length(focal_length)
+    , fov(fov)
     , image_height(image_height)
     , image_width(image_width)
 {
 
-    // Calculates where the viewpoint is within the scene.
-    double viewpoint_height = 2.0;
-    double viewpoint_width = viewpoint_height * ((double) image_width) / image_height;
+    // Calculate the viewpoint width from the FOV.
+    double theta = math::radians(fov);
+    double viewpoint_width = 2 * focal_length * std::tan(theta / 2.0);
+
+    // Calculates the viewpoint height within the same aspect
+    // ratio as the output image.
+    double viewpoint_height = viewpoint_width * ((double) image_height) / image_width;
 
     Eigen::Vector3d viewpoint_u, viewpoint_v;
     viewpoint_u << viewpoint_width, 0.0, 0.0;

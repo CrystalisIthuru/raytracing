@@ -17,6 +17,9 @@ class Camera {
     /** The focal length of the camera used to place the viewport. **/
     double focal_length;
 
+    /** The horizontal FOV of the camera. **/
+    double fov;
+
     /** The actual image height [pixels]. **/
     int image_height;
 
@@ -44,12 +47,14 @@ public:
         @param center The centerpoint for the camera
         @param focal_length The distance infront of the camera the
             viewpoint will be placed.
+        @param fov The horizontal field of view [degrees]
         @param image_height The image height [pixels]
         @param image_width  The image width [pixels]
     **/
     Camera(
         const Eigen::Vector3d &center,
         double focal_length,
+        double fov,
         int image_height,
         int image_width
     );

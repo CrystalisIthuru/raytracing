@@ -21,6 +21,7 @@ int main(int argc, char **argv) {
     raytracing::scene::Camera camera(
         Eigen::Vector3d::Zero(),
         1.0,
+        120.0,
         image_height,
         image_width
     );
