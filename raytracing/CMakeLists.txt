@@ -10,6 +10,7 @@ add_library(raytracing STATIC
     src/raytracing/images/RGBImage.cxx
     src/raytracing/math/Ray.cxx
     src/raytracing/scene/Camera.cxx
+    src/raytracing/shapes/Sphere.cxx
 )
 target_link_libraries(raytracing
     Eigen3::Eigen
