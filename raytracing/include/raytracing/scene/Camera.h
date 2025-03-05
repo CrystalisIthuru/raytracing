@@ -1,12 +1,18 @@
 #pragma once
+#include <functional>
+#include <memory>
 
 #include <Eigen/Core>
+
+#include <raytracing/images/RBGImage.h>
 #include <raytracing/math/Ray.h>
+#include <raytracing/shapes/Hittable.h>
 
 namespace raytracing {
 namespace scene {
 
 typedef Eigen::Matrix<math::Ray, Eigen::Dynamic, Eigen::Dynamic> CameraRays;
+typedef std::function<images::Pixel(const shapes::Hittable &work, const math::Ray &ray)> ColorFunc;
 
 /** A camera with a viewpoint. **/
 class Camera {
@@ -25,15 +31,6 @@ class Camera {
 
     /** The actual image width [pixels]. **/
     int image_width;
-
-    /** The location of the top-left pixel in the viewpoint. **/
-    Eigen::Vector3d pixel_00;
-
-    /** The horizontal distance between pixels in the viewpoint. **/
-    Eigen::Vector3d pixel_delta_u;
-
-    /** The vertical distance between pixels in the viewpoint. **/
-    Eigen::Vector3d pixel_delta_v;
 
     /**
         A matrix of rays going through the viewpoint into a scene.
@@ -60,11 +57,14 @@ public:
     );
 
     /**
-        @return All rays through the viewport.
+        Renders the image the camera can see of the world.
+
+        @param world A list of hittables to render.
+        @param colorer A function that takes a hittable and ray and returns what color
+            that pixel should be.
+        @returns A pointer to an RGB image or nullptr on failure.
     **/
-    const CameraRays& rays() const {
-        return _rays;
-    }
+    images::RGBImage render(const shapes::Hittable &world, const ColorFunc &colorer) const;
 
 };
 

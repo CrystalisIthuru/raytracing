@@ -34,28 +34,27 @@ int main(int argc, char **argv) {
         std::make_shared<raytracing::shapes::Sphere>(Eigen::Vector3d(0, -100.5, -1.0), 100)
     });
 
-    // Render
-    raytracing::images::RGBImage image(image_width, image_height);
-    for(int i = 0; i < image.height(); ++i) {
-        for(int j = 0; j < image.width(); ++j) {
-
-            const raytracing::math::Ray &ray = camera.rays()(i, j);
+    raytracing::images::RGBImage image =  camera.render(
+        world,
+        [] (const raytracing::shapes::Hittable &world, const raytracing::math::Ray &ray) -> raytracing::images::Pixel {
 
             raytracing::shapes::HitRecord record;
-            if(world.hit(ray, raytracing::math::Interval(0.0, raytracing::math::infinity), record)) {
-                image.image()(i, j) = raytracing::images::Pixel(0.5 * (record.n + Eigen::Vector3d::Ones()));
+            raytracing::math::Interval tvalid(0.0, raytracing::math::infinity);
+            if(world.hit(ray, tvalid, record)) {
+                return raytracing::images::Pixel(0.5 * (record.n + Eigen::Vector3d::Ones()));
             } else {
+
                 // Determine the pixel color value by blending white to a
                 // sky blue color.
                 Eigen::Vector3d white; white << 1.0, 1.0, 1.0;
                 Eigen::Vector3d blue; blue << 0.5, 0.7, 1.0;
                 Eigen::Vector3d unit_direction = ray.unit_direction();
                 double a = 0.5 * (unit_direction(1) + 1.0);
-                image.image()(i, j) = raytracing::images::Pixel((1.0 - a) * white + a * blue);
-            }
+                return raytracing::images::Pixel((1.0 - a) * white + a * blue);
 
+            }
         }
-    }
+    );
 
     if(!std::filesystem::is_directory("images")) {
         std::filesystem::create_directory("images");

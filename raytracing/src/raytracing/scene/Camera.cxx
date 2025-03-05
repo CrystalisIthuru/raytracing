@@ -31,15 +31,15 @@ Camera::Camera(
     viewpoint_u << viewpoint_width, 0.0, 0.0;
     viewpoint_v << 0.0, -viewpoint_height, 0.0;
 
-    pixel_delta_u = viewpoint_u / image_width;
-    pixel_delta_v = viewpoint_v / image_height;
+    Eigen::Vector3d pixel_delta_u = viewpoint_u / image_width;
+    Eigen::Vector3d pixel_delta_v = viewpoint_v / image_height;
 
     // Calculate where the top-left corner of the viewpoint within the scene
     Eigen::Vector3d focal_length_vector; focal_length_vector << 0.0, 0.0, focal_length;
     Eigen::Vector3d viewpoint_upper_left = camera_center - focal_length_vector - viewpoint_u / 2.0 - viewpoint_v / 2.0;
 
     // Calculate the upper left pixel within the viewpoint.
-    pixel_00 = viewpoint_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
+    Eigen::Vector3d pixel_00 = viewpoint_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
     // Create Rays from the camera center through each pixel within the
     // viewport.
@@ -53,6 +53,19 @@ Camera::Camera(
     }
 
 }
+
+images::RGBImage Camera::render(const shapes::Hittable &world, const ColorFunc &colorer) const {
+
+    images::RGBImage image(image_width, image_height);
+    for(int i = 0; i < image.height(); ++i) {
+        for(int j = 0; j < image.width(); ++j) {
+            image.image()(i, j) = colorer(world, _rays(i, j));
+        }
+    }
+    return image;
+
+}
+
 
 }
 }
