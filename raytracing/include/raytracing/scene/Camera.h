@@ -32,11 +32,26 @@ class Camera {
     /** The actual image width [pixels]. **/
     int image_width;
 
+    /** The number of samples to take for anti-aliasing. **/
+    int samples_antialiasing = 1;
+
     /**
-        A matrix of rays going through the viewpoint into a scene.
-        Ray (0, 0) is the top left corner of the viewpoint.
+        The position of the top-left pixel in the viewport within
+        scene.
     **/
-    CameraRays _rays;
+    Eigen::Vector3d pixel_00;
+
+    /** The horizontal distance between pixels in the viewport. **/
+    Eigen::Vector3d pixel_delta_u;
+
+    /** The vertical distance between pixels in the viewport. **/
+    Eigen::Vector3d pixel_delta_v;
+
+    /**
+        Retrieves the ray from the camera center through pixel (i, j)
+        in the veiwport.
+    **/
+    math::Ray getRay(int i, int j) const;
 
 public:
 
@@ -55,6 +70,12 @@ public:
         int image_height,
         int image_width
     );
+
+    /**
+        Sets the number of samples taken during the render step for
+        anti-aliasing
+    **/
+    void set_samples_antialiasing(int samples);
 
     /**
         Renders the image the camera can see of the world.

@@ -11,6 +11,12 @@ Interval::Interval(double min, double max)
     , _max(max)
 {}
 
+double Interval::clamp(double x) const {
+    if(x < _min) return _min;
+    if(x > _max) return _max;
+    return x;
+}
+
 bool Interval::contains(double x) const {
     return _min <= x && x <= _max;
 }

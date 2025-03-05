@@ -19,6 +19,11 @@ public:
     Interval(double min, double max);
 
     /**
+        @returns The value clamped to the interval
+    **/
+    double clamp(double x) const;
+
+    /**
         @param x A real number
         @returns Whether a number is within the interval.
     **/

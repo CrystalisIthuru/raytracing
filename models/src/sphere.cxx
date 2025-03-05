@@ -5,13 +5,16 @@
 #include <Eigen/Core>
 
 #include <raytracing/images/RBGImage.h>
+#include <raytracing/math/Interval.h>
+#include <raytracing/math/Random.h>
 #include <raytracing/math/Ray.h>
 #include <raytracing/scene/Camera.h>
-#include <raytracing/shapes/Sphere.h>
 #include <raytracing/shapes/HittableList.h>
-#include <raytracing/math/Interval.h>
+#include <raytracing/shapes/Sphere.h>
 
 int main(int argc, char **argv) {
+
+    raytracing::math::Random::setSeed(1234);
 
     const double aspect_ratio = 16.0 / 9.0;
     const int image_width = 400;
@@ -28,13 +31,14 @@ int main(int argc, char **argv) {
         image_height,
         image_width
     );
+    camera.set_samples_antialiasing(10);
 
     raytracing::shapes::HittableList world({
         std::make_shared<raytracing::shapes::Sphere>(Eigen::Vector3d(0.0, 0.0, -1.0), 0.5),
         std::make_shared<raytracing::shapes::Sphere>(Eigen::Vector3d(0, -100.5, -1.0), 100)
     });
 
-    raytracing::images::RGBImage image =  camera.render(
+    raytracing::images::RGBImage image = camera.render(
         world,
         [] (const raytracing::shapes::Hittable &world, const raytracing::math::Ray &ray) -> raytracing::images::Pixel {
 

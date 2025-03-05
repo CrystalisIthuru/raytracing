@@ -1,7 +1,8 @@
 #pragma once
 
-#include <stdint.h>
 #include <Eigen/Core>
+#include <ostream>
+#include <stdint.h>
 
 namespace raytracing {
 namespace images {
@@ -24,9 +25,10 @@ struct Pixel {
         range from [0.0, 1.0]
     **/
     Pixel(const Eigen::Vector3d &v);
-    
 
 };
+
+std::ostream& operator<<(std::ostream &stream, const Pixel &pixel);
 
 }
 }
