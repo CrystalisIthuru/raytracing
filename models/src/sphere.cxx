@@ -5,12 +5,15 @@
 #include <Eigen/Core>
 
 #include <raytracing/images/RBGImage.h>
+#include <raytracing/materials/Lambertian.h>
+#include <raytracing/materials/Metal.h>
 #include <raytracing/math/Interval.h>
 #include <raytracing/math/Random.h>
 #include <raytracing/math/Ray.h>
+#include <raytracing/math/VectorHelpers.h>
 #include <raytracing/scene/Camera.h>
-#include <raytracing/shapes/HittableList.h>
 #include <raytracing/shapes/Sphere.h>
+#include <raytracing/shapes/SurfaceList.h>
 
 static double gamma2_correct(double x) {
     if(x > 0) {
@@ -21,7 +24,7 @@ static double gamma2_correct(double x) {
 }
 
 static Eigen::Vector3d sphere_colorer(
-    const raytracing::shapes::Hittable &world,
+    const raytracing::shapes::Surface &world,
     const raytracing::math::Ray &ray,
     unsigned int depth,
     unsigned int max_depth
@@ -34,15 +37,18 @@ static Eigen::Vector3d sphere_colorer(
     raytracing::shapes::HitRecord record;
     raytracing::math::Interval tvalid(0.001, raytracing::math::infinity);
     if(world.hit(ray, tvalid, record)) {
-        //Eigen::Vector3d bounce_direction = raytracing::math::Random::uniform_unit_vector_on_hemisphere(record.n);
-        Eigen::Vector3d bounce_direction = record.n + raytracing::math::Random::uniform_unit_vector();
-        Eigen::Vector3d color = 0.5 * sphere_colorer(
-            world,
-            raytracing::math::Ray(record.p, bounce_direction),
-            depth + 1,
-            max_depth
-        );
+        
+        raytracing::math::Ray scattered;
+        Eigen::Vector3d attenuation;
+        Eigen::Vector3d color;
 
+        if(record.mat->scatter(ray, record, attenuation, scattered)) {
+            Eigen::Vector3d next_color = sphere_colorer(world, scattered, depth + 1, max_depth);
+            color = raytracing::math::componentMultiply(attenuation, next_color);
+        } else {
+            color = Eigen::Vector3d::Zero();
+        }
+        
         // Perform gamma2 correction on final resulting pixel
         if(depth == 0) {
             Eigen::Vector3d gamma(
@@ -89,9 +95,16 @@ int main(int argc, char **argv) {
     camera.set_samples_antialiasing(100);
     camera.set_ray_childen_max_depth(50);
 
-    raytracing::shapes::HittableList world({
-        std::make_shared<raytracing::shapes::Sphere>(Eigen::Vector3d(0.0, 0.0, -1.0), 0.5),
-        std::make_shared<raytracing::shapes::Sphere>(Eigen::Vector3d(0, -100.5, -1.0), 100)
+    auto material_ground = std::make_shared<raytracing::materials::Lambertian>(Eigen::Vector3d({0.8, 0.8, 0.0}));
+    auto material_center = std::make_shared<raytracing::materials::Lambertian>(Eigen::Vector3d({0.1, 0.2, 0.5}));
+    auto material_left   = std::make_shared<raytracing::materials::Metal>(Eigen::Vector3d({0.8, 0.8, 0.8}), 0.3);
+    auto material_right  = std::make_shared<raytracing::materials::Metal>(Eigen::Vector3d({0.8, 0.6, 0.2}), 1.0);
+
+    raytracing::shapes::SurfaceList world({
+        std::make_shared<raytracing::shapes::Sphere>(Eigen::Vector3d(0, -100.5, -1.0), 100, material_ground),
+        std::make_shared<raytracing::shapes::Sphere>(Eigen::Vector3d(0.0, 0.0, -1.2), 0.5, material_center),
+        std::make_shared<raytracing::shapes::Sphere>(Eigen::Vector3d(-1.0, 0.0, -1.0), 0.5, material_left),
+        std::make_shared<raytracing::shapes::Sphere>(Eigen::Vector3d(1.0, 0.0, -1.0), 0.5, material_right),
     });
 
     raytracing::images::RGBImage image = camera.render(

@@ -26,6 +26,14 @@ Pixel::Pixel(const Eigen::Vector3d &v) {
     b = int(256 * intensity.clamp(v(2)));
 }
 
+Eigen::Vector3d Pixel::asVector() const {
+    return Eigen::Vector3d(
+        (double) r / 256,
+        (double) g / 256,
+        (double) b / 256
+    );
+}
+
 std::ostream& operator<<(std::ostream &stream, const Pixel &pixel) {
     stream << "<Pixel " << (int) pixel.r << " " << (int) pixel.g << " " << (int) pixel.b << ">";
     return stream;

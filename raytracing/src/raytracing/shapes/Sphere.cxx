@@ -1,11 +1,22 @@
+#include <raytracing/materials/Lambertian.h>
 #include <raytracing/shapes/Sphere.h>
 
 namespace raytracing {
 namespace shapes {
-
+    
 Sphere::Sphere(const Eigen::Vector3d &center, double radius)
     : _center(center)
     , _radius(radius)
+    , _mat(std::make_shared<materials::Lambertian>(Eigen::Vector3d(0.5, 0.5, 0.5)))
+{}
+
+Sphere::Sphere(
+    const Eigen::Vector3d &center, double radius,
+    std::shared_ptr<materials::Material> mat
+)
+    : _center(center)
+    , _radius(radius)
+    , _mat(mat)
 {}
 
 const Eigen::Vector3d& Sphere::center() const {
@@ -39,6 +50,7 @@ bool Sphere::hit(
     record.t = root;
     record.p = ray.at(record.t);
     record.n = (record.p - _center) / _radius;
+    record.mat = _mat;
 
     return true;
     

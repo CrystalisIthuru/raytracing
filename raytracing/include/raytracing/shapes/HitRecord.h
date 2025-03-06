@@ -1,6 +1,15 @@
 #pragma once
 
 #include <Eigen/Core>
+#include <memory>
+
+// Forward Declaration for material to eliminate
+// circular dependency
+namespace raytracing {
+namespace materials {
+class Material;
+}
+}
 
 namespace raytracing {
 namespace shapes {
@@ -18,6 +27,9 @@ struct HitRecord {
         intesects the surface.
     **/
     double t;
+
+    /** The material for the hit object. **/
+    std::shared_ptr<materials::Material> mat = nullptr;
 
 };
 

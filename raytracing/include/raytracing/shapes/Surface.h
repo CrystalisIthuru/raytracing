@@ -8,7 +8,7 @@ namespace raytracing {
 namespace shapes {
 
 /** A shape that a ray can hit. **/
-class Hittable {
+class Surface {
 public:
 
     /**

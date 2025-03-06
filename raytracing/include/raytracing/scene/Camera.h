@@ -6,13 +6,13 @@
 
 #include <raytracing/images/RBGImage.h>
 #include <raytracing/math/Ray.h>
-#include <raytracing/shapes/Hittable.h>
+#include <raytracing/shapes/Surface.h>
 
 namespace raytracing {
 namespace scene {
 
 typedef Eigen::Matrix<math::Ray, Eigen::Dynamic, Eigen::Dynamic> CameraRays;
-typedef std::function<Eigen::Vector3d(const shapes::Hittable &work, const math::Ray &ray, unsigned int depth, unsigned int max_depth)> ColorFunc;
+typedef std::function<Eigen::Vector3d(const shapes::Surface &work, const math::Ray &ray, unsigned int depth, unsigned int max_depth)> ColorFunc;
 
 /** A camera with a viewpoint. **/
 class Camera {
@@ -94,7 +94,7 @@ public:
             that pixel should be.
         @returns A pointer to an RGB image or nullptr on failure.
     **/
-    images::RGBImage render(const shapes::Hittable &world, const ColorFunc &colorer) const;
+    images::RGBImage render(const shapes::Surface &world, const ColorFunc &colorer) const;
 
 };
 

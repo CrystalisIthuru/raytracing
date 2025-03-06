@@ -1,24 +1,24 @@
 #include <raytracing/math/Constants.h>
-#include <raytracing/shapes/HittableList.h>
+#include <raytracing/shapes/SurfaceList.h>
 
 namespace raytracing {
 namespace shapes {
 
-HittableList::HittableList() {}
+SurfaceList::SurfaceList() {}
 
-HittableList::HittableList(const std::vector<std::shared_ptr<Hittable>> &objects)
+SurfaceList::SurfaceList(const std::vector<std::shared_ptr<Surface>> &objects)
     : objects(objects)
 {}
 
-void HittableList::add(std::shared_ptr<Hittable> object) {
+void SurfaceList::add(std::shared_ptr<Surface> object) {
     objects.push_back(object);
 }
 
-void HittableList::clear() {
-    objects = std::vector<std::shared_ptr<Hittable>>();
+void SurfaceList::clear() {
+    objects = std::vector<std::shared_ptr<Surface>>();
 }
 
-bool HittableList::hit(
+bool SurfaceList::hit(
     const math::Ray &ray, const math::Interval &tvalid, HitRecord &record
 ) const {
 

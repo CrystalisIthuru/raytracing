@@ -1,16 +1,18 @@
 #pragma once
 
 #include <Eigen/Core>
+#include <raytracing/materials/Material.h>
 #include <raytracing/math/Ray.h>
-#include <raytracing/shapes/Hittable.h>
+#include <raytracing/shapes/Surface.h>
 
 namespace raytracing {
 namespace shapes {
 
-class Sphere : public Hittable {
+class Sphere : public Surface {
 
     Eigen::Vector3d _center;
     double _radius;
+    std::shared_ptr<materials::Material> _mat = nullptr;
 
 public:
 
@@ -19,6 +21,16 @@ public:
         @param radius The radius of the sphere.
     **/
     Sphere(const Eigen::Vector3d &center, double radius);
+
+    /**
+        @param center The centerpoint of the sphere.
+        @param radius The radius of the sphere.
+        @param mat The material for the sphere.
+    **/
+    Sphere(
+        const Eigen::Vector3d &center, double radius,
+        std::shared_ptr<materials::Material> mat
+    );
 
     /**
         @returns The centerpoint of the sphere.

@@ -26,6 +26,12 @@ struct Pixel {
     **/
     Pixel(const Eigen::Vector3d &v);
 
+    /**
+        Converts the pixel into a vector of pixel values scaled down
+        by 256
+    **/
+    Eigen::Vector3d asVector() const;
+
 };
 
 std::ostream& operator<<(std::ostream &stream, const Pixel &pixel);

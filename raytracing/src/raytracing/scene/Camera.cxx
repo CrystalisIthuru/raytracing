@@ -71,7 +71,7 @@ void Camera::set_samples_antialiasing(unsigned int samples) {
     samples_antialiasing = samples;
 }
 
-images::RGBImage Camera::render(const shapes::Hittable &world, const ColorFunc &colorer) const {
+images::RGBImage Camera::render(const shapes::Surface &world, const ColorFunc &colorer) const {
 
     std::vector<std::shared_ptr<std::thread>> threads;
     
