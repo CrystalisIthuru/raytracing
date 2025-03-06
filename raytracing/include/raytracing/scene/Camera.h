@@ -12,7 +12,7 @@ namespace raytracing {
 namespace scene {
 
 typedef Eigen::Matrix<math::Ray, Eigen::Dynamic, Eigen::Dynamic> CameraRays;
-typedef std::function<images::Pixel(const shapes::Hittable &work, const math::Ray &ray)> ColorFunc;
+typedef std::function<Eigen::Vector3d(const shapes::Hittable &work, const math::Ray &ray, unsigned int depth, unsigned int max_depth)> ColorFunc;
 
 /** A camera with a viewpoint. **/
 class Camera {
@@ -32,8 +32,11 @@ class Camera {
     /** The actual image width [pixels]. **/
     int image_width;
 
+    /** The number of times a ray is allowed to bounce. **/
+    unsigned int ray_children_max_depth = 1;
+
     /** The number of samples to take for anti-aliasing. **/
-    int samples_antialiasing = 1;
+    unsigned int samples_antialiasing = 1;
 
     /**
         The position of the top-left pixel in the viewport within
@@ -72,10 +75,16 @@ public:
     );
 
     /**
+        Sets the max number of times a ray is allowed to bounce in a
+        scene.
+    **/
+    void set_ray_childen_max_depth(unsigned int max);
+
+    /**
         Sets the number of samples taken during the render step for
         anti-aliasing
     **/
-    void set_samples_antialiasing(int samples);
+    void set_samples_antialiasing(unsigned int samples);
 
     /**
         Renders the image the camera can see of the world.

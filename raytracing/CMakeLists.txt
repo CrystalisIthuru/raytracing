@@ -17,6 +17,7 @@ add_library(raytracing STATIC
 )
 target_link_libraries(raytracing
     Eigen3::Eigen
+    pthread
 )
 target_include_directories(raytracing PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include

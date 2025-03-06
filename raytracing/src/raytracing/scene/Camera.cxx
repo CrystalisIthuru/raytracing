@@ -1,4 +1,7 @@
 #include <iostream>
+#include <thread>
+#include <mutex>
+
 #include <raytracing/math/Conversions.h>
 #include <raytracing/math/Random.h>
 #include <raytracing/scene/Camera.h>
@@ -59,35 +62,53 @@ math::Ray Camera::getRay(int i, int j) const {
     Eigen::Vector3d ray_direction = pixel_center - camera_center;
     return math::Ray(camera_center, ray_direction);
 }
+    
+void Camera::set_ray_childen_max_depth(unsigned int max) {
+    ray_children_max_depth = max;
+}
 
-void Camera::set_samples_antialiasing(int samples) {
+void Camera::set_samples_antialiasing(unsigned int samples) {
     samples_antialiasing = samples;
 }
 
 images::RGBImage Camera::render(const shapes::Hittable &world, const ColorFunc &colorer) const {
 
+    std::vector<std::shared_ptr<std::thread>> threads;
+    
     images::RGBImage image(image_width, image_height);
+    std::recursive_mutex image_mutex;
+
     for(int i = 0; i < image.height(); ++i) {
         std::cout << "Line: " << i << std::endl;
         for(int j = 0; j < image.width(); ++j) {
+            std::shared_ptr<std::thread> thread = std::make_shared<std::thread>(
+                [this, &image_mutex, &image, &world, colorer] (
+                    int i, int j
+                ) {
 
-            // Pixel only allows for values between 0 and 255. While sampling
-            // we need to accumulate all the intensity values and then scale
-            // them back down for anti-aliasing
-            Eigen::Vector3i color = Eigen::Vector3i::Zero();
-            for(int k = 0; k < samples_antialiasing; ++k) {
-                images::Pixel sample_color = colorer(world, getRay(i, j));
-                color(0) += sample_color.r;
-                color(1) += sample_color.g;
-                color(2) += sample_color.b;
-            }
-            image.image()(i, j) = images::Pixel(
-                color(0) / samples_antialiasing,
-                color(1) / samples_antialiasing,
-                color(2) / samples_antialiasing
+                    // Pixel only allows for values between 0 and 255. While sampling
+                    // we need to accumulate all the intensity values and then scale
+                    // them back down for anti-aliasing
+                    Eigen::Vector3d color = Eigen::Vector3d::Zero();
+                    for(int k = 0; k < samples_antialiasing; ++k) {
+                        color += colorer(world, getRay(i, j), 0, ray_children_max_depth);
+                    }
+                    {
+                        std::lock_guard<std::recursive_mutex> lock(image_mutex);
+                        image.image()(i, j) = images::Pixel(color / samples_antialiasing);
+                    }
+                },
+                i,
+                j
             );
+            threads.push_back(thread);
         }
     }
+
+    for(std::shared_ptr<std::thread> thread : threads) {
+        thread->join();
+    }
+
     return image;
 
 }
