@@ -1,8 +1,16 @@
 
 project(raytracing)
 
-find_package(Eigen3 REQUIRED NO_MODULE)
-find_package(GTest REQUIRED)
+find_package(Eigen3 3.3.4 NO_MODULE)
+if(NOT Eigen3_FOUND)
+    include(FetchContent)
+    set(FETCHCONTENT_QUIET OFF)
+    FetchContent_Declare(Eigen
+        GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+        GIT_TAG 3.4.0
+    )
+    FetchContent_MakeAvailable(Eigen)
+endif()
 
 #--- Raytracer Library --------------------------------------------------
 add_library(raytracing STATIC
