@@ -1,6 +1,7 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
+#include <deque>
 
 #include <raytracing/math/Conversions.h>
 #include <raytracing/math/Random.h>
@@ -78,14 +79,33 @@ images::RGBImage Camera::render(const shapes::Surface &world, const ColorFunc &c
     images::RGBImage image(image_width, image_height);
     std::recursive_mutex image_mutex;
 
+    std::deque<std::tuple<int, int>> locs;
+    std::recursive_mutex locs_mutex;
     for(int i = 0; i < image.height(); ++i) {
-        std::cout << "Line: " << i << std::endl;
         for(int j = 0; j < image.width(); ++j) {
-            std::shared_ptr<std::thread> thread = std::make_shared<std::thread>(
-                [this, &image_mutex, &image, &world, colorer] (
-                    int i, int j
-                ) {
+            locs.push_back(std::make_tuple(i, j));
+        }
+    }
 
+    for(int i = 0; i < 20; ++i) {
+        std::shared_ptr<std::thread> thread = std::make_shared<std::thread>(
+            [this, &image_mutex, &image, &locs_mutex, &locs, &world, colorer] () {
+
+                while(true) {
+
+                    // Retrive the next pixel location to process.
+                    int i, j;
+                    {
+                        std::lock_guard<std::recursive_mutex> lock(locs_mutex);
+                        if(locs.size() == 0) return;
+                        std::tuple<int, int> loc = locs.front();
+                        locs.pop_front();
+                        i = std::get<0>(loc);
+                        j = std::get<1>(loc);
+                    }
+
+                    std::cout << "Pixel: " << i << " " << j << std::endl;
+                    
                     // Pixel only allows for values between 0 and 255. While sampling
                     // we need to accumulate all the intensity values and then scale
                     // them back down for anti-aliasing
@@ -97,12 +117,11 @@ images::RGBImage Camera::render(const shapes::Surface &world, const ColorFunc &c
                         std::lock_guard<std::recursive_mutex> lock(image_mutex);
                         image.image()(i, j) = images::Pixel(color / samples_antialiasing);
                     }
-                },
-                i,
-                j
-            );
-            threads.push_back(thread);
-        }
+
+                }
+            }
+        );
+        threads.push_back(thread);
     }
 
     for(std::shared_ptr<std::thread> thread : threads) {
